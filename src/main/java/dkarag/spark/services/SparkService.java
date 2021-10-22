@@ -1,7 +1,9 @@
-package dkarag.spark.utils;
+package dkarag.spark.services;
 
 
+import dkarag.spark.utils.JdbcUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.sql.*;
 import org.apache.spark.storage.StorageLevel;
@@ -11,14 +13,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 import dkarag.spark.configs.JdbcConfig;
 import dkarag.spark.configs.SparkConfig;
+import org.springframework.stereotype.Service;
 
+@Service
 @RequiredArgsConstructor
-public class SparkUtils {
+public class SparkService {
     private SparkSession.Builder sparkSessionBuilder;
     private SparkSession sparkSession;
     private SparkConfig sparkConfig;
     private JdbcConfig jdbcConfig;
-    private final JdbcUtils jdbcUtils;
     private final Environment environment;
 
     public SparkSession createSparkSession(String jobName) {
@@ -87,9 +90,9 @@ public class SparkUtils {
                 .option("user", jdbcConfig.getUsername())
                 .option("password", jdbcConfig.getPassword())
                 .option("partitionColumn", partitionColumn)
-                .option("lowerBound", jdbcUtils.lowerBoundOfColumn(partitionColumn, tableName, jdbcConfig))
-                .option("upperBound", jdbcUtils.upperBoundOfColumn(partitionColumn, tableName, jdbcConfig))
-                .option("numPartitions", jdbcUtils.rowsOfTable(tableName, jdbcConfig) / valueToDivideCountOfRows)
+                .option("lowerBound", JdbcUtils.lowerBoundOfColumn(partitionColumn, tableName, jdbcConfig))
+                .option("upperBound", JdbcUtils.upperBoundOfColumn(partitionColumn, tableName, jdbcConfig))
+                .option("numPartitions", JdbcUtils.rowsOfTable(tableName, jdbcConfig) / valueToDivideCountOfRows)
                 .load()
                 .persist(StorageLevel.MEMORY_AND_DISK());
 

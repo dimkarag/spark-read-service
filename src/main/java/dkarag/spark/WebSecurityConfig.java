@@ -1,8 +1,12 @@
-package dkarag.spark.auth;
+package dkarag.spark;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -10,10 +14,18 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.filter.ShallowEtagHeaderFilter;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@EnableWebSecurity
 @Configuration
-class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableWebSecurity
+
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Value("${server.api-prefix}")
+    private String apiPrefix;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -55,5 +67,14 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
-}
 
+    @Bean
+    public FilterRegistrationBean shallowEtagBean() {
+        FilterRegistrationBean frb = new FilterRegistrationBean();
+        frb.setFilter(new ShallowEtagHeaderFilter());
+        frb.addUrlPatterns("/assets/*",  "/api/*");
+        frb.setOrder(2);
+        return frb;
+    }
+
+}
