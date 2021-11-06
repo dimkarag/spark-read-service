@@ -1,21 +1,18 @@
 server:
     port: 8084
+    api-prefix: api
 
-spring:
-    profiles:
-    active: dev
-
-dkarag.spark:
-    host: spark://host:port
-    applicationName: application_Name
-    parquetFolderPath: folder_path_where_tables_are_being_sqooped
-    executorCores: num_of_cores_per_executor
-    memoryPerExecutor: allocated_memory_per_executor #m for MByte, G for Gigabyte (1000m or 1g)
-    sparkDriverMemory: allocated_memory_for_spark_driver #m for MByte, G for Gigabyte (1000m or 1g), default is 1000m
-    coresPerSparkSession: num_of_cores_per_SparkSession #recommended
+spark:
+    host: spark://localhost:7077 #host of master
+    applicationName: spark-read-service #spark application name
+    parquetFolderPath: './parquets'  #folder path to store parquet files 
+    executorCores: 6 #number of Cores to be used from each executor (this defines the no of executors to be created based on total cores of the spark session
+    memoryPerExecutor: 5000M #m for MByte, G for Gigabyte (1000m or 1g)
+    sparkDriverMemory: 2000M #m for MByte, G for Gigabyte (1000m or 1g), default is 1000m
+    coresPerSparkSession: 6 #number of Cores to be used from Spark from your total of your machine
 
 database:
     jdbc:
-        username: root
-        password:
-        url: jdbc:mysql://:3306/dev_ab?useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+        username: YOUR_USERNAME
+        password: YOUR_PASSWORD
+        url: jdbc:mysql://localhost:3306/YOUR_DB?useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
