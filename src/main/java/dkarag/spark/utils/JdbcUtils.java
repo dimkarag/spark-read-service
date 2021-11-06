@@ -19,7 +19,7 @@ public class JdbcUtils {
     public static Long lowerBoundOfColumn(String columnName, String tableName, JdbcConfig jdbcConfig){
         JdbcTemplate jdbcTemplate = new JdbcTemplate(createDriverManagerDataSource(jdbcConfig));
         String query = "select min(" + columnName + ") as min from " + tableName;
-        return Long.valueOf(String.valueOf(jdbcTemplate.queryForList(query).get(0).get("max")));
+        return Long.valueOf(String.valueOf(jdbcTemplate.queryForList(query).get(0).get("min")));
     }
 
     private static DriverManagerDataSource createDriverManagerDataSource(JdbcConfig jdbcConfig) {

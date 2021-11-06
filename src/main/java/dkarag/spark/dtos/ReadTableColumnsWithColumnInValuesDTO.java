@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 public class ReadTableColumnsWithColumnInValuesDTO {
     private String tableName;
-    private List<String> columnNames = new ArrayList<>();
+    private List<String> columnsToSelect = new ArrayList<>();
     private String columnToCheckValue;
     private List<?> valuesIn = new ArrayList<>();
 }

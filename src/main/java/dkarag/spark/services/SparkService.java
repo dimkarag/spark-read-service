@@ -89,6 +89,10 @@ public class SparkService {
     }
 
     public Dataset<Row> sqoopTableInPartitions(String tableName, String partitionColumn, long valueToDivideCountOfRows, boolean writeToParquet) {
+        Properties properties = new Properties();
+        properties.put("user", jdbcConfig.getUsername());
+        properties.put("password", jdbcConfig.getPassword());
+
         Dataset<Row> data =  sparkSession.read()
                 .option("url", jdbcConfig.getUrl())
                 .option("user", jdbcConfig.getUsername())
@@ -97,7 +101,7 @@ public class SparkService {
                 .option("lowerBound", JdbcUtils.lowerBoundOfColumn(partitionColumn, tableName, jdbcConfig))
                 .option("upperBound", JdbcUtils.upperBoundOfColumn(partitionColumn, tableName, jdbcConfig))
                 .option("numPartitions", JdbcUtils.rowsOfTable(tableName, jdbcConfig) / valueToDivideCountOfRows)
-                .load()
+                .jdbc(jdbcConfig.getUrl(), tableName, properties)
                 .persist(StorageLevel.MEMORY_AND_DISK());
 
         if(writeToParquet) {

@@ -7,5 +7,5 @@ import java.util.List;
 @Data
 public class ReadTableColumnsDTO {
     private String tableName;
-    private List<String> columnNames = new ArrayList<>();
+    private List<String> columnsToSelect = new ArrayList<>();
 }
