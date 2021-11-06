@@ -2,8 +2,11 @@ package dkarag.spark.services;
 
 
 import dkarag.spark.utils.JdbcUtils;
+import dkarag.spark.utils.TimeUtils;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.sql.*;
 import org.apache.spark.storage.StorageLevel;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Getter
 public class SparkService {
     private SparkSession.Builder sparkSessionBuilder;
     private SparkSession sparkSession;
@@ -43,11 +47,11 @@ public class SparkService {
         this.sparkSessionBuilder = SparkSession.builder().
                 master(sparkConfig.getMasterHost()).
                 appName(sparkConfig.getApplicationName()).
-                config("dkarag.spark.cores.max", Integer.parseInt(sparkConfig.getCoresPerSparkSession())).
-                config("dkarag.spark.executor.cores", sparkConfig.getExecutorsCores()).
-                config("dkarag.spark.executor.memory", sparkConfig.getMemoryPerExecutor()).
-                config("dkarag.spark.executor.extraJavaOptions", "-XX:+UseCompressedOops").
-                config("dkarag.spark.sql.jsonGenerator.ignoreNullFields", false);
+                config("spark.cores.max", Integer.parseInt(sparkConfig.getCoresPerSparkSession())).
+                config("spark.executor.cores", sparkConfig.getExecutorsCores()).
+                config("spark.executor.memory", sparkConfig.getMemoryPerExecutor()).
+                config("spark.executor.extraJavaOptions", "-XX:+UseCompressedOops").
+                config("spark.sql.jsonGenerator.ignoreNullFields", false);
     }
 
     private void writeToParquet(String parquetFolderPath, Dataset<Row> jdbcDF, String tableName) {
@@ -103,23 +107,6 @@ public class SparkService {
     }
 
 
-
-//    public Dataset<Row> sqoopTableColumnsWithColumnInValues(SparkRequirements sparkReqs, String tableName, String[] selectedColumns, String columnToCheckValues,  int... values) {
-//        String columnsToSelect = "*";
-//        if (selectedColumns!= null && selectedColumns.length > 0) {
-//            columnsToSelect = StringUtils.join(selectedColumns, ",");
-//        }
-//        String valuesInString = StringUtils.join(ArrayUtils.toObject(values), ",");
-//
-//        if (valuesInString.isBlank()) {
-//            valuesInString = "\'\'";
-//        }
-//        String query = "SELECT " + columnsToSelect + " FROM " + tableName + " WHERE " + columnToCheckValues + " IN (" + valuesInString + ")";
-//
-//        return getDataset(sparkReqs, query);
-//    }
-
-
     public Dataset<Row> sqoopTableColumnsWithColumnInValues(String tableName, String columnToCheckValues, List<?> inValues, boolean writeToParquet, String ...selectedColumns) {
         String columnsToSelect = "*";
         if (selectedColumns!= null && selectedColumns.length > 0) {
@@ -153,8 +140,9 @@ public class SparkService {
         if (selectedColumns.length > 0) {
             columnsToSelect = StringUtils.join(selectedColumns, ",");
         }
-
-        String query = "SELECT "+ columnsToSelect +" FROM "+tableName+ " WHERE "+dateColumn+" >= '"+ startDate+"' AND "+dateColumn+" <= '"+endDate+"'";
+        String strStartDate = TimeUtils.format(TimeUtils.toStartOfTheDay(startDate),"yyyy-MM-dd HH:mm:ss");
+        String strEndDate = TimeUtils.format(TimeUtils.toEndOfTheDay(endDate),"yyyy-MM-dd HH:mm:ss");
+        String query = "SELECT "+ columnsToSelect +" FROM "+tableName+ " WHERE "+dateColumn+" >= '"+ strStartDate +"' AND "+dateColumn+" <= '"+strEndDate+"'";
 
         return sqoopTableWithQuery(query, tableName, writeToParquet);
     }

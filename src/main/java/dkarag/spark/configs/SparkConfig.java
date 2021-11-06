@@ -17,11 +17,11 @@ public class SparkConfig {
     private String parquetFolderPath;
     public SparkConfig(Environment environment, String jobName) {
         this.environment = environment;
-        masterHost = this.environment.getProperty("dkarag.spark.host");
-        applicationName = this.environment.getProperty("dkarag.spark.appName") + '-' + jobName;
-        executorsCores = this.environment.getProperty("dkarag.spark.executorCores");
-        coresPerSparkSession = this.environment.getProperty("dkarag.spark.coresPerSparkSession");
-        memoryPerExecutor = this.environment.getProperty("dkarag.spark.memoryPerExecutor");
-        parquetFolderPath = this.environment.getProperty("dkarag.spark.parquetFolderPath");
+        masterHost = this.environment.getProperty("spark.host");
+        applicationName = this.environment.getProperty("spark.appName") + '-' + jobName;
+        executorsCores = this.environment.getProperty("spark.executorCores");
+        coresPerSparkSession = this.environment.getProperty("spark.coresPerSparkSession");
+        memoryPerExecutor = this.environment.getProperty("spark.memoryPerExecutor");
+        parquetFolderPath = this.environment.getProperty("spark.parquetFolderPath");
     }
 }
